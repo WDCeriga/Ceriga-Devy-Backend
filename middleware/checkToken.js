@@ -1,20 +1,19 @@
-import jwt from "jsonwebtoken"
-import config from "../config.js"
+import jwt from "jsonwebtoken";
+import config from "../config.js";
 
-const checkToken = (req,res, next) => { 
-  const authHeather  = req.header("Authorization")
-  if (!authHeather || !authHeather.startsWith("Bearer")){
-    res.status(401).json({message: "No token, authorization denied"})
+const checkToken = (req, res, next) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token, authorization denied" });
   }
-  const token  = authHeather.split(' ')[1]
+  const token = authHeader.split(' ')[1];
   try {
-    console.log(token)
-    const {id} = jwt.verify(token, config.jwtSecret)
-    req.id = id
-    next()
+    const { id } = jwt.verify(token, config.jwtSecret);
+    req.id = id;
+    next();
   } catch (e) {
-    res.status(401).json({ message: 'Token is not valid' });
+    return res.status(401).json({ message: 'Token is not valid' });
   }
-}
+};
 
-export default checkToken
+export default checkToken;
