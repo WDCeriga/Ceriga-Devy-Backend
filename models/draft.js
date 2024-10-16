@@ -10,6 +10,19 @@ const MaterialSchema = {
   value: { type: String, default: null },
 };
 
+const PrintingSchema = {
+  type: String,
+  default: "",
+  enum: [
+    "Direct to Film",
+    "Dye Sublimation",
+    "Embroidery",
+    "Plastisol Transfers",
+    "Screen Printing",
+    ""
+  ]
+}
+
 const StitchingSchema = {
   type: { type: String, default: 'Standard' },
   description: { type: String, default: '' },
@@ -71,8 +84,9 @@ export const DraftSchema = new Schema({
   orderStep: { type: String, default: null },
   productType: { type: String, default: null },
   dyeStyle: { type: String, default: null },
-  color: { type: String, default: null },
+  color: { hex: { type: String, default: null }, path: { type: String, default: null } },
   material: MaterialSchema,
+  printing: PrintingSchema,
   stitching: StitchingSchema,
   fading: FadingSchema,
   neck: NeckSchema,
@@ -135,6 +149,10 @@ export const DraftSchema = new Schema({
   tableSize: {
     type: [TableSizeRowSchema],
     default: [],
+  },
+  tableType: {
+    type: String || null,
+    default: null,
   },
   status: {
     type: String,

@@ -254,20 +254,11 @@ export const createCheckoutSession = async (req, res) => {
   const { orderId } = req.query;
   try {
     const order = await Order.findOne({ orderId },
-      { userId: 1, name: 1, subtotal: 1, productType: 1 }).lean();
+      { userId: 1, name: 1, subtotal: 1, productType: 1, color: 1 }).lean();
     if (order) {
       const cost = Math.ceil(order.subtotal * 100);
-      let image = 'https://cergy-server.vercel.app/public/products/'//`${config.backendUrl}/public/products/`
-      switch (order.productType) {
-        case "T-shirt": image += 't-shirt.png'; break;
-        case "Hoodie": image += 'hoodie.png'; break;
-        case "Sweat Pants": image += 'sweat_pants.png'; break;
-        case "Crewneck": image += 'crewneck.png'; break;
-        case "Zip Up Hoodie": image += "zip_up_hoodie.png"; break;
-        case "Tank Top": image += 'tank-top.png'; break;
-        case "Sweat Pants uncuffed": image += 'uncuffed_sweatpants.png'; break;
-        default: image = false
-      }
+
+      let image = `${config.backendUrl}${order.color.path}`
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -308,6 +299,7 @@ export const createCheckoutSession = async (req, res) => {
     }
 
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 };
@@ -363,7 +355,6 @@ export const confirmCheckoutSession = async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(payment.transactionCode);
     console.log('Session retrieved:', session);
     const { metadata } = session;
-
     console.log('Checkout session completed:', metadata);
     const { orderId } = metadata
     handleChangePaymentStatus(orderId)
@@ -457,7 +448,7 @@ export const getInvoiceOrder = async (req, res) => {
 export const confirmInvoice = async (req, res) => {
   const { orderId } = req.query
   try {
-    const order = await Order.findOneAndUpdate({ orderId }, { invoice: { status: "confirmed" } })
+    const order = await Order.findOneAndUpdate({ orderId }, { invoice: { status: "confirmed" }, status: "Submitted" })
     if (order) {
       await sendConfirmInvoiceForAdmin(orderId, order.manufacturer)
       res.status(200).json(order)

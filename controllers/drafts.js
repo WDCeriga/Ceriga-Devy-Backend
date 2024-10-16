@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path, { dirname } from "path"
+import { fileURLToPath } from 'url';
+
 import Draft from "../models/draft.js"
 import Product from "../models/product.js"
 import setBasePrice from "../services/setPrice.js"
@@ -82,38 +86,48 @@ const duplicateDraft = async (req, res) => {
       })
     }
   } catch (e) {
-    res.statu(500).json(e)
+    res.status(500).json(e)
   }
 }
-
 const deleteDraft = async (req, res) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
   const { draftId } = req.query;
   try {
     const candidate = await Draft.findById(draftId, { _id: 1, designUploads: 1, labelUploads: 1, neckUploads: 1 }).lean();
     if (candidate) {
       await Draft.findByIdAndDelete(draftId);
+
       const directoryPath = path.join(__dirname, '/public/uploads');
       const deleteFiles = (fileNames) => {
-        fileNames.forEach(fileName => {
-          const filePath = path.join(directoryPath, fileName);
-          fs.unlink(filePath, (err) => {
-            if (err) {
-              console.error(`Error deleting file ${filePath}:`, err);
-            } else {
-              console.log(`Successfully deleted ${filePath}`);
-            }
+        return Promise.all(fileNames.map(fileName => {
+          return new Promise((resolve, reject) => {
+            const filePath = path.join(directoryPath, fileName);
+            fs.unlink(filePath, (err) => {
+              if (err) {
+                console.error(`Error deleting file ${filePath}:`, err);
+                return reject(err);
+              } else {
+                console.log(`Successfully deleted ${filePath}`);
+                return resolve();
+              }
+            });
           });
-        });
+        }));
       };
-      deleteFiles(candidate.designUploads);
-      deleteFiles(candidate.labelUploads);
-      deleteFiles(candidate.neckUploads);
+      await Promise.all([
+        deleteFiles(candidate.designUploads),
+        deleteFiles(candidate.labelUploads),
+        deleteFiles(candidate.neckUploads),
+      ]);
+
       res.status(200).json(draftId);
     } else {
       res.status(404).json({ message: "Draft not found" });
     }
   } catch (e) {
-    res.status(500).json(e);
+    console.error(e);
+    res.status(500).json({ message: "An error occurred", error: e.message });
   }
 };
 

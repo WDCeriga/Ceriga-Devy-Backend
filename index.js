@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { handleWebhook } from './controllers/order.js';
 import adminRouter from './routes/admin.js';
 import authRouter from './routes/auth.js';
+import ColorsRouter from './routes/colors.js';
 import draftsRouter from './routes/drafts.js';
 import emailRouter from './routes/mail.js';
 import notificationRouter from './routes/notification.js';
@@ -94,6 +95,7 @@ app.use('/products', productsRouter);
 app.use('/drafts', draftsRouter)
 app.use("/orders", orderRouter)
 app.use("/email", emailRouter)
+app.use("/colors", ColorsRouter)
 
 // Create server
 const server = http.createServer(app);
