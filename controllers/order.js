@@ -52,7 +52,8 @@ export const getOrderList = async (req, res) => {
         tracking: order.tracking,
         orderData: order.createAt,
         orderStatus: order.status,
-        subtotal: order.subtotal
+        subtotal: order.subtotal,
+        name: order.name
       }))
       res.status(200).json(ordersDTO)
     } else {
@@ -88,7 +89,8 @@ export const getAllOrderList = async (req, res) => {
       manufacturer: 1,
       subtotal: 1,
       totalPrice: 1,
-      invoice: 1
+      invoice: 1,
+      name: 1
     }).lean();
     if (ordersList && ordersList.length > 0) {
       const ordersDTO = await Promise.all(ordersList.map(async (order) => {
@@ -102,9 +104,11 @@ export const getAllOrderList = async (req, res) => {
           orderStatus: order.status,
           subtotal: order.subtotal,
           totalPrice: order.subtotal + (order.shipping || 0),
-          invoice: order.invoice
+          invoice: order.invoice,
+          name: order.name
         };
       }));
+      console.log(ordersDTO);
       res.status(200).json(ordersDTO);
     } else {
       res.status(404).json({ message: "No orders found" });
@@ -227,6 +231,21 @@ export const changeManufacturer = async (req, res) => {
     if (candidate) {
       await Order.findOneAndUpdate({ orderId }, { manufacturer: newManufacturer })
       res.status(200).json(newManufacturer)
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (e) {
+    res.status(500).json(e);
+  }
+}
+
+export const changeNameInOrder = async (req, res) => {
+  const { orderId, newName } = req.query
+  try {
+    const candidate = await Order.findOne({ orderId }, { _id: 1 }).lean();
+    if (candidate) {
+      await Order.findOneAndUpdate({ orderId }, { name: newName })
+      res.status(200).json(newName)
     } else {
       res.status(404).json({ message: "Order not found" });
     }

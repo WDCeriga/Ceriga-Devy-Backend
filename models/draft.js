@@ -84,7 +84,11 @@ export const DraftSchema = new Schema({
   orderStep: { type: String, default: null },
   productType: { type: String, default: null },
   dyeStyle: { type: String, default: null },
-  color: { hex: { type: String, default: null }, path: { type: String, default: null } },
+  color: {
+    hex: { type: String, default: null },
+    path: { type: String, default: null },
+    description: { type: String, default: "" }
+  },
   material: MaterialSchema,
   printing: PrintingSchema,
   stitching: StitchingSchema,

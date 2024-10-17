@@ -1,5 +1,6 @@
 import {
   changeManufacturer,
+  changeNameInOrder,
   changeOrdersStatus,
   confirmCheckoutSession,
   confirmInvoice,
@@ -42,6 +43,7 @@ orderRouter.get("/total-count", adminMiddleware, getTotalCountInOrder);
 
 orderRouter.put("/change-status", adminMiddleware, changeOrdersStatus);
 orderRouter.put("/change-manufacturer", adminMiddleware, changeManufacturer);
+orderRouter.put('/change-name', checkToken, changeNameInOrder )
 //delete
 orderRouter.delete("/delete", checkToken, deleteOrder);
 orderRouter.delete("/delete-by-admin", adminMiddleware, deleteOrderByAdmin);
