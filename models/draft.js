@@ -125,6 +125,10 @@ export const DraftSchema = new Schema({
     type: [String],
     default: []
   },
+  neckDescription: {
+    type: String,
+    default: ""
+  },
   packageUploads: {
     type: [String],
     default: []

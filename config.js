@@ -1,9 +1,9 @@
 export default {
   port: 4000,
-  // backendUrl: 'http://localhost:4000',
-  // frontEndUrl: "http://localhost:5173",
-  backendUrl: "https://ceriga-devy-backend.vercel.app",
-  frontEndUrl: "https://ceriga-devy.vercel.app",
+  backendUrl: 'http://localhost:4000',
+  frontEndUrl: "http://localhost:5173",
+  // backendUrl: "https://ceriga-devy-backend.vercel.app",
+  // frontEndUrl: "https://ceriga-devy.vercel.app",
   //frontEndUrl: "https://ceriga.co",
 
   corsOptions: {
