@@ -45,8 +45,8 @@ const updateDraft = async (req, res) => {
   try {
     const currentDraft = await Draft.findById(draft.draftId).lean()
     if (currentDraft) {
-      const product = await Product.findOne({ name: draft.productType }, { startingPrice: 1 }).lean()
-      const subtotal = setBasePrice(currentDraft, product.startingPrice)
+      const product = await Product.findOne({ name: draft.productType }, { startingPrice: 1, bulkPrice: 1 }).lean()
+      const subtotal = setBasePrice(currentDraft, product.startingPrice, product.bulkPrice)
       await Draft.findByIdAndUpdate(
         draft.draftId,
         {

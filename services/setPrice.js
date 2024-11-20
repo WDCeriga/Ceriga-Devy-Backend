@@ -1,8 +1,9 @@
-const setBasePrice = (order, unitPrice) => {
+const setBasePrice = (order, unitPrice, bulkPrice) => {
+  const verifyBulkPrice = bulkPrice || unitPrice;
   if (!order || typeof unitPrice !== 'number') {
     throw new Error('Invalid input parameters');
   }
-  let basePrice = unitPrice;
+  let basePrice = order.quantity.type === "Sample Selection" ? unitPrice : verifyBulkPrice
   if (order.material && order.material.name) {
     switch (order.material.name) {
       case 'Polyester':
@@ -66,20 +67,21 @@ const setBasePrice = (order, unitPrice) => {
     }
   }
 
-  
+
   if (Array.isArray(order.labelUploads) && order.labelUploads.length > 0) {
     basePrice += 1.00;
   }
 
   if (order.quantity && Array.isArray(order.quantity.list)) {
+
     const totalQuantity = order.quantity.list.reduce((sum, item) => {
-      return sum + (item.value || 0); 
+      return sum + (item.value || 0);
     }, 0);
 
     const totalPrice = basePrice * totalQuantity;
 
     return totalPrice;
-  } 
+  }
 };
 
 export default setBasePrice;

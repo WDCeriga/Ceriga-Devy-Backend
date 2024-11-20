@@ -1,4 +1,5 @@
 import Order from "../models/order.js";
+import Product from "../models/product.js";
 import User from "../models/user.js";
 
 const promoteToAdmin = async (req, res) => {
@@ -83,7 +84,7 @@ const getUsers = async (req, res) => {
         status: 'Completed'
       }).lean();
 
-     
+
       const amountOfOrders = completedOrders.reduce((total, order) => total + order.subtotal, 0);
 
       return {
@@ -99,12 +100,48 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getProductsForPrice = async (req, res) => {
+  try {
+    const products = await Product.find({}, { startingPrice: 1, bulkPrice: 1, name: 1 }).lean()
+    res.status(200).json(products.map((item) => (
+      {
+        id: item._id,
+        name: item.name,
+        startingPrice: item.startingPrice,
+        bulkPrice: item.bulkPrice || item.startingPrice
+      }
+    )))
+  } catch (e) {
+    console.log(e)
+    res.status(500).json('Server error');
+  }
+}
+
+const saveNewPriceForProduct = async (req, res) => {
+  try {
+    const candidate = await Product.findById(req.body.id)
+    if (candidate) {
+      await Product.findByIdAndUpdate(req.body.id, {
+        startingPrice: req.body.startingPrice,
+        bulkPrice: req.body.bulkPrice
+      })
+      res.status(200).json({ id: req.body.id, message: "Price was updated successfully" })
+    } else {
+      res.status(404).json('Product not found')
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).json('Server error');
+  }
+}
+
 const changeManufacturerInAdmin = async (req, res) => {
   const { id, manufacturer } = req.query
   try {
     const candidate = await User.findById(id, { _id: 1 }).lean()
     if (candidate) {
       await User.findByIdAndUpdate(id, { manufacturer })
+  
       res.status(200).json({ id, manufacturer, message: "Manufacturer was updated successfully" })
     } else {
       res.status(404).json('User not found')
@@ -228,7 +265,7 @@ const getAnalyticsForOrderAmounts = async (req, res) => {
 const getUsersEmails = async (req, res) => {
   try {
     const users = await User.find({}, { email: 1 }).lean();
-  
+
     res.status(200).json(users.map((user) => user.email));
   } catch (e) {
     console.error(e);
@@ -247,5 +284,7 @@ export {
   getAnalyticsForUsers,
   getAnalyticsForOrders,
   getAnalyticsForOrderAmounts,
-  getUsersEmails
+  getUsersEmails,
+  getProductsForPrice,
+  saveNewPriceForProduct
 }

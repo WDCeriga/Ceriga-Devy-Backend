@@ -19,7 +19,8 @@ const PrintingSchema = {
     "Embroidery",
     "Plastisol Transfers",
     "Screen Printing",
-    ""
+    "",
+    "No Printing",
   ]
 }
 

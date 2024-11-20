@@ -3,9 +3,10 @@ import { Schema, model } from "mongoose";
 const ProductSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String },
-  categories: [{ type: String }], 
-  moq: { type: Number, required: true }, 
+  categories: [{ type: String }],
+  moq: { type: Number, required: true },
   startingPrice: { type: Number, required: true },
+  bulkPrice: { type: Number, required: true },
   fabric: [
     {
       type: { type: String, required: true },
@@ -14,7 +15,7 @@ const ProductSchema = new Schema({
     }
   ],
   colorOptions: { type: Number, default: 3 },
-  additionalColorCost: { type: Number, default: 1 }, 
+  additionalColorCost: { type: Number, default: 1 },
   dyeStyles: [
     {
       type: { type: String, required: true },
@@ -23,7 +24,7 @@ const ProductSchema = new Schema({
   ],
   fits: [{ type: String }],
   origin: { type: String, default: "Made in Portugal" },
-  leadTime: { type: String, required: true }, 
+  leadTime: { type: String, required: true },
   labelOptions: [
     {
       type: { type: String, required: true },
@@ -48,7 +49,7 @@ const ProductSchema = new Schema({
       cost: { type: Number, required: true }
     }
   ],
-  images: [{ type: String }], 
+  images: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
 });
 

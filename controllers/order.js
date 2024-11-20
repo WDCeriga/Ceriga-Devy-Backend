@@ -1,8 +1,12 @@
 import {
+  sendAddOrderToAdmin,
+  sendCompeteOrder,
   sendConfirmInvoiceForAdmin,
+  sendDeliveryOrder,
   sendInvoiceNotificationForSuperAdmin,
   sendNewOrderForSuperAdmin,
   sendNewOrderForUser,
+  sendPaymentAvailability,
   sendPaymentSuccessForAdmin,
   sendPaymentSuccessForUser
 } from "../services/emails/sendEmails.js";
@@ -230,6 +234,7 @@ export const changeManufacturer = async (req, res) => {
     const candidate = await Order.findOne({ orderId }, { _id: 1 }).lean();
     if (candidate) {
       await Order.findOneAndUpdate({ orderId }, { manufacturer: newManufacturer })
+      sendAddOrderToAdmin(newManufacturer, orderId);
       res.status(200).json(newManufacturer)
     } else {
       res.status(404).json({ message: "Order not found" });
@@ -397,7 +402,15 @@ export const changeOrdersStatus = async (req, res) => {
         text: `Your order with ID ${orderId} has been updated to ${newStatus}.`
       }
       const notification = new Notification(newMessage)
-
+      if (newStatus === "Submitted") { 
+        sendPaymentAvailability(order)
+      }
+      if (newStatus === "Completed") { 
+        sendCompeteOrder(order)
+      }
+      if (newStatus ===  "Shipping") { 
+        sendDeliveryOrder(order)
+      }
       await notification.save()
       res.status(200).json({ orderId, orderStatus: newStatus });
     } else {
@@ -529,4 +542,19 @@ export const updateShipping = async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 
+}
+
+export const getDeliveryInfo = async (req, res) =>  {
+  const { orderId } = req.query
+  try { 
+    const order = await Order.findOne({orderId}, {delivery:1}).lean() 
+    if (order) { 
+      res.status(200).json(order.delivery)
+    } else { 
+      res.status(404).json("Order not found")
+    }
+
+  } catch (e) { 
+    res.status(500).json({ error: e.message });
+  }
 }
