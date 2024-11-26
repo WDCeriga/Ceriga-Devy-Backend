@@ -2,7 +2,7 @@ import Order from "../../models/order.js";
 import User from "../../models/user.js";
 import config from "../../config.js";
 import transporter from "../emailTransporter.js";
-import { addOrderToAdmin, completeOrderEmail, deliveryOrderEmail, generateEmailCreateOrder, generateEmailForgotPassword, generateEmailInvoiceToSuperAdmin, generateEmailNewNotification, generateEmailOrderCreate, generateEmailPaymentForAdmins, generateEmailPaymentForUser, generateEmailWithConfirmInvoice } from "./htmlGenerarte.js";
+import { addOrderToAdmin, completeOrderEmail, deliveryOrderEmail, generateEmailCreateOrder, generateEmailForgotPassword, generateEmailInvoiceToSuperAdmin, generateEmailNewNotification, generateEmailOrderCreate, generateEmailPaymentForAdmins, generateEmailPaymentForUser, generateEmailWithConfirmInvoice, newMessageEmail } from "./htmlGenerarte.js";
 
 export const sendInvoiceNotificationForSuperAdmin = async (orderId, adminId) => {
   const adminInfo = await User.findById(adminId, { name: 1, last_name: 1 }).lean()
@@ -47,7 +47,7 @@ export const sendCompeteOrder = async (order) => {
   }
 }
 
-export const sendPaymentAvailability = async (order) => { 
+export const sendPaymentAvailability = async (order) => {
   const user = await User.findById(order.userId).lean();
   if (user) {
     const mailOptions = {
@@ -170,3 +170,15 @@ export const sendNewNotification = async (email, name) => {
   console.log('Email sent: ' + info.response);
 }
 
+
+
+export const sendNewNotificationByAdmin = async (email, username, message) => {
+  const mailOptions = {
+    from: config.email.user,
+    to: email,
+    subject: "New Notification",
+    html: newMessageEmail(message, username)
+  };
+  const info = await transporter.sendMail(mailOptions);
+  console.log('Email sent: ' + info.response);
+}

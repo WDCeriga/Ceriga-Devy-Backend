@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid"
 
-import { sendNewNotification } from "../services/emails/sendEmails.js"
+import { sendNewNotification, sendNewNotificationByAdmin } from "../services/emails/sendEmails.js"
 import Notification from "../models/notification.js"
 import User from "../models/user.js"
 
@@ -31,7 +31,8 @@ const sendNotification = async (req, res) => {
     if (user) {
       const newNotification = new Notification({ title: 'New Notification', message, text: message, userId: user._id, })
       await newNotification.save()
-      sendNewNotification(email, user.name)
+ 
+      await sendNewNotificationByAdmin(email, user.name, message)
       res.status(200).json(newNotification)
     } else {
       res.status(404).json({ message: "User not found" })

@@ -6,7 +6,7 @@ import checkToken from "../middleware/checkToken.js";
 
 const notificationRouter = Router()
 
-notificationRouter.post("/create-item-test", checkToken, createTestNotification)
+//notificationRouter.post("/create-item-test", checkToken, createTestNotification)
 
 notificationRouter.post("/send", checkToken, checkSuperAdminRole, sendNotification)
 
